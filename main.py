@@ -7,6 +7,7 @@ from flask_login import UserMixin, login_user, LoginManager, current_user, logou
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, Text
+from flask_migrate import Migrate
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 # Import your forms from the forms.py
@@ -55,6 +56,7 @@ app.config['SECRET_KEY'] = os.environ.get('FLASK_KEY')
 ckeditor = CKEditor(app)
 Bootstrap5(app)
 
+
 # # Other configurations... (_request_ctx_stack fix cont'd)
 # app.jinja_env.filters['gravatar'] = gravatar_url
 
@@ -75,6 +77,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DB_URI", "sqlite:///post
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 
+# sqlite migration: if we make changes to the database structure
+#  in env, run 'flask db init'> 'flask db migrate -m  "desired message"'> 'flask db upgrade' or 'flask db downgrade'
+migrate = Migrate(app,db) #or migrate.init_app(app, db)
 
 # TODO: Create a User table for all your registered users.
 class User(UserMixin, db.Model):
